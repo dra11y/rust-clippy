@@ -2,6 +2,7 @@ use std::collections::hash_map::Entry;
 
 use arrayvec::ArrayVec;
 use clippy_config::Conf;
+use clippy_config::types::{DisallowedPath, create_disallowed_map};
 use clippy_utils::diagnostics::{span_lint, span_lint_and_sugg, span_lint_and_then};
 use clippy_utils::macros::{
     FormatArgsStorage, FormatParamUsage, MacroCall, find_format_arg_expr, format_arg_removal_span,
@@ -9,6 +10,7 @@ use clippy_utils::macros::{
     root_macro_call_first_node,
 };
 use clippy_utils::msrvs::{self, Msrv};
+use clippy_utils::paths::PathNS;
 use clippy_utils::source::{SpanRangeExt, snippet};
 use clippy_utils::ty::{implements_trait, is_type_lang_item};
 use clippy_utils::{is_diag_trait_item, is_from_proc_macro, is_in_test, trait_ref_of_method};
@@ -21,6 +23,8 @@ use rustc_data_structures::fx::FxHashMap;
 use rustc_errors::Applicability;
 use rustc_errors::SuggestionStyle::{CompletelyHidden, ShowCode};
 use rustc_hir::attrs::AttributeKind;
+use rustc_hir::def::DefKind;
+use rustc_hir::def_id::DefIdMap;
 use rustc_hir::{Expr, ExprKind, LangItem, RustcVersion, find_attr};
 use rustc_lint::{LateContext, LateLintPass, LintContext};
 use rustc_middle::ty::adjustment::{Adjust, Adjustment};
@@ -242,6 +246,7 @@ pub struct FormatArgs<'tcx> {
     format_args: FormatArgsStorage,
     msrv: Msrv,
     ignore_mixed: bool,
+    additional_format_macros: DefIdMap<(&'static str, &'static DisallowedPath<false>)>,
     ty_msrv_map: FxHashMap<Ty<'tcx>, Option<RustcVersion>>,
     has_derived_debug: FxHashMap<Ty<'tcx>, bool>,
     has_pointer_format: FxHashMap<Ty<'tcx>, bool>,
@@ -250,10 +255,19 @@ pub struct FormatArgs<'tcx> {
 impl<'tcx> FormatArgs<'tcx> {
     pub fn new(tcx: TyCtxt<'tcx>, conf: &'static Conf, format_args: FormatArgsStorage) -> Self {
         let ty_msrv_map = make_ty_msrv_map(tcx);
+        let (additional_format_macros, _) = create_disallowed_map(
+            tcx,
+            &conf.additional_format_macros,
+            PathNS::Macro,
+            |def_kind| matches!(def_kind, DefKind::Macro(_)),
+            "macro",
+            false,
+        );
         Self {
             format_args,
             msrv: conf.msrv,
             ignore_mixed: conf.allow_mixed_uninlined_format_args,
+            additional_format_macros,
             ty_msrv_map,
             has_derived_debug: FxHashMap::default(),
             has_pointer_format: FxHashMap::default(),
@@ -264,7 +278,8 @@ impl<'tcx> FormatArgs<'tcx> {
 impl<'tcx> LateLintPass<'tcx> for FormatArgs<'tcx> {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if let Some(macro_call) = root_macro_call_first_node(cx, expr)
-            && is_format_macro(cx, macro_call.def_id)
+            && (is_format_macro(cx, macro_call.def_id)
+                || self.additional_format_macros.contains_key(&macro_call.def_id))
             && let Some(format_args) = self.format_args.get(cx, expr, macro_call.expn)
         {
             let mut linter = FormatArgsExpr {

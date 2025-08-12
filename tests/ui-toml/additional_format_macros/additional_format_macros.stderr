@@ -1,0 +1,100 @@
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:35:5
+   |
+LL |     logging::private!("{}", a);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `-D clippy::uninlined-format-args` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::uninlined_format_args)]`
+help: change this to
+   |
+LL -     logging::private!("{}", a);
+LL +     logging::private!("{a}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:38:5
+   |
+LL |     logging::private!("{:?}", b);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     logging::private!("{:?}", b);
+LL +     logging::private!("{b:?}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:41:5
+   |
+LL |     logging::private!("{}, {:?}", a, b);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     logging::private!("{}, {:?}", a, b);
+LL +     logging::private!("{a}, {b:?}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:44:5
+   |
+LL |     logging::private!("{}, {:?}", a, b.clone());
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     logging::private!("{}, {:?}", a, b.clone());
+LL +     logging::private!("{a}, {:?}", b.clone());
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:49:5
+   |
+LL |     logging::private!("{a}, {:?}", b);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     logging::private!("{a}, {:?}", b);
+LL +     logging::private!("{a}, {b:?}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:54:5
+   |
+LL |     exported!("{}", a);
+   |     ^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     exported!("{}", a);
+LL +     exported!("{a}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:57:5
+   |
+LL |     annotated!("{}", a);
+   |     ^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     annotated!("{}", a);
+LL +     annotated!("{a}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:60:5
+   |
+LL |     logging::ambiguous!("{}", a);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     logging::ambiguous!("{}", a);
+LL +     logging::ambiguous!("{a}");
+   |
+
+error: aborting due to 8 previous errors
+

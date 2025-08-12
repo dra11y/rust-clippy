@@ -1,0 +1,64 @@
+#![warn(clippy::uninlined_format_args)]
+
+mod logging {
+    // private inside module
+    macro_rules! private { ($($t:tt)*) => { println!($($t)*); } }
+
+    // exported from module
+    #[macro_export]
+    macro_rules! exported { ($($t:tt)*) => { println!($($t)*); } }
+
+    // ambiguous in matched module
+    macro_rules! ambiguous { ($($t:tt)*) => { println!($($t)*); } }
+
+    // annotated and not included in `additional-format-macros`
+    #[clippy::format_args]
+    #[macro_export]
+    macro_rules! annotated { ($($t:tt)*) => { println!($($t)*); } }
+
+    pub(crate) use {ambiguous, private};
+}
+
+mod other {
+    // ambiguous in unmatched module
+    macro_rules! ambiguous { ($($t:tt)*) => { println!($($t)*); } }
+
+    pub(crate) use ambiguous;
+}
+
+use logging::private;
+
+fn main() {
+    let a = 1;
+    let b = Some("test".to_string());
+
+    logging::private!("{}", a);
+    //~^ uninlined_format_args
+
+    logging::private!("{:?}", b);
+    //~^ uninlined_format_args
+
+    logging::private!("{}, {:?}", a, b);
+    //~^ uninlined_format_args
+
+    logging::private!("{}, {:?}", a, b.clone());
+    //~^ uninlined_format_args
+
+    logging::private!("{a}, {:?}", b.clone());
+
+    logging::private!("{a}, {:?}", b);
+    //~^ uninlined_format_args
+
+    logging::private!("{a}, {b:?}");
+
+    exported!("{}", a);
+    //~^ uninlined_format_args
+
+    annotated!("{}", a);
+    //~^ uninlined_format_args
+
+    logging::ambiguous!("{}", a);
+    //~^ uninlined_format_args
+
+    other::ambiguous!("{}", a);
+}

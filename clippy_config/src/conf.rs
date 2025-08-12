@@ -375,6 +375,19 @@ define_Conf! {
     /// Whether to allow mixed uninlined format args, e.g. `format!("{} {}", a, foo.bar)`
     #[lints(uninlined_format_args)]
     allow_mixed_uninlined_format_args: bool = true,
+    /// Additional macros treated like `format!`, `println!`, etc. for `uninlined_format_args`.
+    /// Use this for third-party macros lacking `#[clippy::format_args]`.
+    ///
+    /// Example:
+    /// ```toml
+    /// additional-format-macros = [
+    ///     "tracing::info",
+    ///     { path = "log::debug", allow-invalid = true }
+    /// ]
+    /// ```
+    #[disallowed_paths_allow_replacements = false]
+    #[lints(uninlined_format_args)]
+    additional_format_macros: Vec<DisallowedPath<false>> = Vec::new(),
     /// Whether to allow `r#""#` when `r""` can be used
     #[lints(needless_raw_string_hashes)]
     allow_one_hash_in_raw_strings: bool = false,
