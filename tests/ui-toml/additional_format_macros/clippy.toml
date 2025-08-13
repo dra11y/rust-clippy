@@ -1,2 +1,1 @@
-additional-format-macros = ["additional_format_macros::logging::private", "additional_format_macros::logging::exported", "additional_format_macros::logging::ambiguous"]
-allow-mixed-uninlined-format-args = false
+additional-format-macros = ["additional_format_macros::logging::private", "additional_format_macros::logging::exported", "additional_format_macros::logging::ambiguous", "additional_format_macros::simple_tracing_like::info"]

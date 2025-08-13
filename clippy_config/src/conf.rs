@@ -354,6 +354,17 @@ define_Conf! {
     /// Whether to accept a safety comment to be placed above the statement containing the `unsafe` block
     #[lints(undocumented_unsafe_blocks)]
     accept_comment_above_statement: bool = true,
+    /// Additional macros to be treated like `format!` or `println!` for the `uninlined_format_args` lint.
+    /// Use to lint third-party macros that lack the `#[clippy::format_args]` annotation.
+    ///
+    /// #### Example
+    ///
+    /// ```toml
+    /// additional-format-macros = ["tracing::trace", "tracing::debug", "tracing::info", "tracing::warn", "tracing::error"]
+    /// ```
+    #[disallowed_paths_allow_replacements = false]
+    #[lints(uninlined_format_args)]
+    additional_format_macros: Vec<DisallowedPathWithoutReplacement> = Vec::new(),
     /// Don't lint when comparing the result of a modulo operation to zero.
     #[lints(modulo_arithmetic)]
     allow_comparison_to_zero: bool = true,
@@ -375,19 +386,6 @@ define_Conf! {
     /// Whether to allow mixed uninlined format args, e.g. `format!("{} {}", a, foo.bar)`
     #[lints(uninlined_format_args)]
     allow_mixed_uninlined_format_args: bool = true,
-    /// Additional macros treated like `format!`, `println!`, etc. for `uninlined_format_args`.
-    /// Use this for third-party macros lacking `#[clippy::format_args]`.
-    ///
-    /// Example:
-    /// ```toml
-    /// additional-format-macros = [
-    ///     "tracing::info",
-    ///     { path = "log::debug", allow-invalid = true }
-    /// ]
-    /// ```
-    #[disallowed_paths_allow_replacements = false]
-    #[lints(uninlined_format_args)]
-    additional_format_macros: Vec<DisallowedPath<false>> = Vec::new(),
     /// Whether to allow `r#""#` when `r""` can be used
     #[lints(needless_raw_string_hashes)]
     allow_one_hash_in_raw_strings: bool = false,

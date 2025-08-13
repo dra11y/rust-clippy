@@ -1,5 +1,34 @@
 #![warn(clippy::uninlined_format_args)]
 
+mod simple_tracing_like {
+    // Test a few cases from tracing with complex patterns.
+    // Complete coverage requires lintcheck CI test.
+    macro_rules! info {
+        // Name / target / parent.
+        (name: $name:expr, target: $target:expr, parent: $parent:expr, { $($field:tt)* }, $($arg:tt)* ) => (
+            println!($($arg)*)
+        );
+
+        // Name.
+        (name: $name:expr, { $($field:tt)* }, $($arg:tt)* ) => (
+            println!($($arg)*)
+        );
+        (name: $name:expr, $($arg:tt)+ ) => (
+            println!($($arg)*)
+        );
+
+        // ...
+        ({ $($field:tt)+ }, $($arg:tt)+ ) => (
+            println!($($arg)*)
+        );
+        ($($arg:tt)+) => (
+            println!($($arg)*)
+        );
+    }
+
+    pub(crate) use info;
+}
+
 mod logging {
     // private inside module
     macro_rules! private { ($($t:tt)*) => { println!($($t)*); } }
@@ -26,11 +55,9 @@ mod other {
     pub(crate) use ambiguous;
 }
 
-use logging::private;
-
 fn main() {
     let a = 1;
-    let b = Some("test".to_string());
+    let b = Some("test");
 
     logging::private!("{a}");
     //~^ uninlined_format_args
@@ -41,15 +68,8 @@ fn main() {
     logging::private!("{a}, {b:?}");
     //~^ uninlined_format_args
 
-    logging::private!("{a}, {:?}", b.clone());
-    //~^ uninlined_format_args
-
-    logging::private!("{a}, {:?}", b.clone());
-
     logging::private!("{a}, {b:?}");
     //~^ uninlined_format_args
-
-    logging::private!("{a}, {b:?}");
 
     exported!("{a}");
     //~^ uninlined_format_args
@@ -60,5 +80,35 @@ fn main() {
     logging::ambiguous!("{a}");
     //~^ uninlined_format_args
 
+    simple_tracing_like::info!(name: "test", "This is a test with {b:?}");
+    //~^ uninlined_format_args
+
+    simple_tracing_like::info!(name: "test", { b }, "This is a test with {a}");
+    //~^ uninlined_format_args
+
+    simple_tracing_like::info!(name: "test", target: "test_target", parent: "test_parent", { field1: "value1" }, "This is a test with {a}");
+    //~^ uninlined_format_args
+
+    simple_tracing_like::info!({ a, b }, "This is a test with {a}");
+    //~^ uninlined_format_args
+
+    simple_tracing_like::info!("This is a test with {b:?}");
+    //~^ uninlined_format_args
+
+    // Check for false positives
+
+    logging::private!("{}, {:?}", a, b.clone());
+
+    logging::private!("{a}, {:?}", b.clone());
+
+    logging::private!("{a}, {b:?}");
+
+    // Same name but different module
     other::ambiguous!("{}", a);
+
+    simple_tracing_like::info!({ a }, "This is a test with {b:?}");
+
+    simple_tracing_like::info!({ a, b }, "This is a test");
+
+    simple_tracing_like::info!(name: "test", target: "test_target", parent: "test_parent", { field1: "value1" }, "This is a test with {a}");
 }

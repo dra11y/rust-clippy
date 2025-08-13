@@ -51,6 +51,23 @@ Whether to accept a safety comment to be placed above the statement containing t
 * [`undocumented_unsafe_blocks`](https://rust-lang.github.io/rust-clippy/master/index.html#undocumented_unsafe_blocks)
 
 
+## `additional-format-macros`
+Additional macros to be treated like `format!` or `println!` for the `uninlined_format_args` lint.
+Use to lint third-party macros that lack the `#[clippy::format_args]` annotation.
+
+#### Example
+
+```toml
+additional-format-macros = ["tracing::trace", "tracing::debug", "tracing::info", "tracing::warn", "tracing::error"]
+```
+
+**Default Value:** `[]`
+
+---
+**Affected lints:**
+* [`uninlined_format_args`](https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args)
+
+
 ## `allow-comparison-to-zero`
 Don't lint when comparing the result of a modulo operation to zero.
 

@@ -1,5 +1,5 @@
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:35:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:62:5
    |
 LL |     logging::private!("{}", a);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -13,7 +13,7 @@ LL +     logging::private!("{a}");
    |
 
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:38:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:65:5
    |
 LL |     logging::private!("{:?}", b);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -25,7 +25,7 @@ LL +     logging::private!("{b:?}");
    |
 
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:41:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:68:5
    |
 LL |     logging::private!("{}, {:?}", a, b);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -37,19 +37,7 @@ LL +     logging::private!("{a}, {b:?}");
    |
 
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:44:5
-   |
-LL |     logging::private!("{}, {:?}", a, b.clone());
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-help: change this to
-   |
-LL -     logging::private!("{}, {:?}", a, b.clone());
-LL +     logging::private!("{a}, {:?}", b.clone());
-   |
-
-error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:49:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:71:5
    |
 LL |     logging::private!("{a}, {:?}", b);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -61,7 +49,7 @@ LL +     logging::private!("{a}, {b:?}");
    |
 
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:54:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:74:5
    |
 LL |     exported!("{}", a);
    |     ^^^^^^^^^^^^^^^^^^
@@ -73,7 +61,7 @@ LL +     exported!("{a}");
    |
 
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:57:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:77:5
    |
 LL |     annotated!("{}", a);
    |     ^^^^^^^^^^^^^^^^^^^
@@ -85,7 +73,7 @@ LL +     annotated!("{a}");
    |
 
 error: variables can be used directly in the `format!` string
-  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:60:5
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:80:5
    |
 LL |     logging::ambiguous!("{}", a);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -96,5 +84,65 @@ LL -     logging::ambiguous!("{}", a);
 LL +     logging::ambiguous!("{a}");
    |
 
-error: aborting due to 8 previous errors
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:83:5
+   |
+LL |     simple_tracing_like::info!(name: "test", "This is a test with {:?}", b);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     simple_tracing_like::info!(name: "test", "This is a test with {:?}", b);
+LL +     simple_tracing_like::info!(name: "test", "This is a test with {b:?}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:86:5
+   |
+LL |     simple_tracing_like::info!(name: "test", { b }, "This is a test with {}", a);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     simple_tracing_like::info!(name: "test", { b }, "This is a test with {}", a);
+LL +     simple_tracing_like::info!(name: "test", { b }, "This is a test with {a}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:89:5
+   |
+LL |     simple_tracing_like::info!(name: "test", target: "test_target", parent: "test_parent", { field1: "value1" }, "This is a test with {}", a);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     simple_tracing_like::info!(name: "test", target: "test_target", parent: "test_parent", { field1: "value1" }, "This is a test with {}", a);
+LL +     simple_tracing_like::info!(name: "test", target: "test_target", parent: "test_parent", { field1: "value1" }, "This is a test with {a}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:92:5
+   |
+LL |     simple_tracing_like::info!({ a, b }, "This is a test with {}", a);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     simple_tracing_like::info!({ a, b }, "This is a test with {}", a);
+LL +     simple_tracing_like::info!({ a, b }, "This is a test with {a}");
+   |
+
+error: variables can be used directly in the `format!` string
+  --> tests/ui-toml/additional_format_macros/additional_format_macros.rs:95:5
+   |
+LL |     simple_tracing_like::info!("This is a test with {:?}", b);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: change this to
+   |
+LL -     simple_tracing_like::info!("This is a test with {:?}", b);
+LL +     simple_tracing_like::info!("This is a test with {b:?}");
+   |
+
+error: aborting due to 12 previous errors
 

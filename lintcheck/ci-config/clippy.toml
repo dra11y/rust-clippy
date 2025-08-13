@@ -5,3 +5,5 @@
 
 avoid-breaking-exported-api = false
 lint-commented-code = false
+
+additional-format-macros = ["tracing::trace", "tracing::debug", "tracing::info", "tracing::warn", "tracing::error"]
